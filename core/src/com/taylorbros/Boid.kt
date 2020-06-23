@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2
 interface Boid {
     val position: Vector2
     val velocity: Vector2
-    fun update(otherBoids: Set<Boid>)
+    val localDistance: Float
+    val flockingPower: Float
+    fun update(otherLocalBoids: Set<Boid>)
     fun render(shapeRenderer: ShapeRenderer)
 }

@@ -11,6 +11,8 @@ class BoidCars : ApplicationAdapter() {
 
     val boidCount = 200
     val maxSpeed = 10f
+    val localDistance = 50f
+    val flockingPower = 1f
 
     var shapeRenderer: ShapeRenderer? = null
     val boids = mutableSetOf<Boid>()
@@ -24,15 +26,27 @@ class BoidCars : ApplicationAdapter() {
                     MathUtils.random() * Gdx.graphics.height
             )
             var velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * maxSpeed)
-            boids.add(Bird(position, velocity))
+            boids.add(Bird(position, velocity, localDistance, flockingPower))
         }
     }
 
     override fun render() {
-        boids.forEach { it.update(boids) }
+        boids.forEach {
+            val otherLocalBoids = findOtherLocalBoids(it)
+            it.update(boids) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         boids.forEach { it.render(shapeRenderer!!) }
+    }
+
+    fun findOtherLocalBoids(principal : Boid) : Set<Boid> {
+        val otherLocalBoids = mutableSetOf<Boid>()
+        boids.forEach { target ->
+            if (principal != target && principal.position.dst(target.position) < localDistance) {
+                otherLocalBoids.add(target)
+            }
+        }
+        return otherLocalBoids
     }
 
     override fun dispose() {
