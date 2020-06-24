@@ -12,7 +12,7 @@ class BoidCars : ApplicationAdapter() {
     val boidCount = 300
     val maxSpeed = 5f
     val maxAcceleration = 1f
-    val localDistance = 100f
+    val localDistance = 200f
     val flockingPower = 1f
 
     var shapeRenderer: ShapeRenderer? = null

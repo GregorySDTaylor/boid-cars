@@ -68,8 +68,13 @@ class Bird(
     }
 
     private fun alignmentForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {
-        val alignmentForce = Vector2()
-        return alignmentForce
+        val averageOtherVelocity = Vector2()
+        otherLocalBoids.forEach { other ->
+            averageOtherVelocity.add(other.velocity)
+        }
+        averageOtherVelocity.scl( 1f / otherLocalBoids.count())
+        val alignmentForce = averageOtherVelocity.scl(maxSpeed / averageOtherVelocity.len())
+        return alignmentForce.scl(flockingPower)
     }
 
     private fun cohesionForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {
