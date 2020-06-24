@@ -13,7 +13,7 @@ class BoidCars : ApplicationAdapter() {
     val maxSpeed = 5f
     val maxAcceleration = 1f
     val localDistance = 100f
-    val flockingPower = 5f
+    val flockingPower = 1f
 
     var shapeRenderer: ShapeRenderer? = null
     val boids = mutableSetOf<Boid>()
