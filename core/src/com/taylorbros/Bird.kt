@@ -3,6 +3,7 @@ package com.taylorbros
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
+import kotlin.math.pow
 
 class Bird(
         override val position: Vector2,
@@ -60,11 +61,12 @@ class Bird(
             val vectorAwayFromOther = this.position.cpy().sub(other.position)
             val distance = vectorAwayFromOther.len()
             val proportionOfLocalDistance = distance / localDistance
-            val inverseProportionOfLocalDistance = 1 - proportionOfLocalDistance
+            val squareProportionOfLocalDistance = proportionOfLocalDistance.pow(2)
+            val inverseProportionOfLocalDistance = 1 - squareProportionOfLocalDistance
             vectorAwayFromOther.setLength(inverseProportionOfLocalDistance)
             separationForce.add(vectorAwayFromOther)
         }
-        return separationForce.scl(flockingPower / otherLocalBoids.count())
+        return separationForce.scl(flockingPower)
     }
 
     private fun alignmentForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {
@@ -86,7 +88,8 @@ class Bird(
         vectorToCenterOfMass.scl(1f / otherLocalBoids.count())
         val distance = vectorToCenterOfMass.len()
         val proportionOfLocalDistance = distance / localDistance
-        val cohesionForce = vectorToCenterOfMass.setLength(proportionOfLocalDistance)
+        val rootProportionOfLocalDistance = proportionOfLocalDistance.pow(1/2)
+        val cohesionForce = vectorToCenterOfMass.setLength(rootProportionOfLocalDistance)
         return cohesionForce.scl(flockingPower)
     }
 

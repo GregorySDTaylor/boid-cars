@@ -9,10 +9,10 @@ import com.badlogic.gdx.math.Vector2
 
 class BoidCars : ApplicationAdapter() {
 
-    val boidCount = 300
+    val boidCount = 100
     val maxSpeed = 5f
     val maxAcceleration = 1f
-    val localDistance = 200f
+    val localDistance = 100f
     val flockingPower = 1f
 
     var shapeRenderer: ShapeRenderer? = null
