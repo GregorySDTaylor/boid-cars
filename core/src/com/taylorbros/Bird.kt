@@ -3,6 +3,7 @@ package com.taylorbros
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 class Bird(
@@ -20,7 +21,7 @@ class Bird(
         acceleration.setZero()
         if (otherLocalBoids.isNotEmpty()) {
             val separationForce = separationForce(otherLocalBoids, localDistance)
-            val alignmentForce = alignmentForce(otherLocalBoids, localDistance)
+            val alignmentForce = alignmentForce(otherLocalBoids)
             val cohesionForce = cohesionForce(otherLocalBoids, localDistance)
             val separationForceMagnitude = separationForce.len()
             val alignmentForceMagnitude = alignmentForce.len()
@@ -37,7 +38,22 @@ class Bird(
             velocity.setLength(maxSpeed)
         }
         position.add(velocity)
-        wrapEdges()
+        reflectEdges()
+    }
+
+    private fun reflectEdges() {
+        if (position.x > Gdx.graphics.width) {
+            velocity.x = - velocity.x.absoluteValue
+        }
+        if (position.y > Gdx.graphics.height) {
+            velocity.y = - velocity.y.absoluteValue
+        }
+        if (position.x < 0) {
+            velocity.x = velocity.x.absoluteValue
+        }
+        if (position.y < 0) {
+            velocity.y = velocity.y.absoluteValue
+        }
     }
 
     private fun wrapEdges() {
@@ -69,7 +85,7 @@ class Bird(
         return separationForce.scl(flockingPower)
     }
 
-    private fun alignmentForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {
+    private fun alignmentForce(otherLocalBoids: Set<Boid>): Vector2 {
         val averageOtherVelocity = Vector2()
         otherLocalBoids.forEach { other ->
             averageOtherVelocity.add(other.velocity)
@@ -98,6 +114,6 @@ class Bird(
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
         shapeRenderer.circle(position.x, position.y, 5f)
         shapeRenderer.setColor(0.7f, 0.7f, 0.7f, 1f)
-        shapeRenderer.line(position, position.cpy().add(velocity.cpy().scl(5f)))
+        shapeRenderer.rectLine(position, position.cpy().add(velocity.cpy().scl(2f)), 3f)
     }
 }
