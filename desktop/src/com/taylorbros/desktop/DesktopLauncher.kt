@@ -9,8 +9,8 @@ object DesktopLauncher {
     fun main(arg: Array<String>) {
         val config = LwjglApplicationConfiguration()
         config.title = "Boids"
-        config.width = 1600
-        config.height = 800
+        config.width = 1920
+        config.height = 1080
         LwjglApplication(BoidCars(), config)
     }
 }

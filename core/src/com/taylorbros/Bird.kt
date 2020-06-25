@@ -90,9 +90,13 @@ class Bird(
         otherLocalBoids.forEach { other ->
             averageOtherVelocity.add(other.velocity)
         }
-        averageOtherVelocity.scl( 1f / otherLocalBoids.count())
-        val alignmentForce = averageOtherVelocity.scl(maxSpeed / averageOtherVelocity.len())
-        return alignmentForce.scl(flockingPower)
+        val velocityDifference = averageOtherVelocity.sub(this.velocity)
+        val velocityDifferenceMagnitude = velocityDifference.len()
+        val averageOtherVelocityMagnitude = averageOtherVelocity.len()
+        val thisVelocityMagnitude = this.velocity.len()
+        val normalizedMagnitude = velocityDifferenceMagnitude / (averageOtherVelocityMagnitude + thisVelocityMagnitude)
+        val normalizedVelocityDifference = velocityDifference.setLength(normalizedMagnitude)
+        return normalizedVelocityDifference.scl(flockingPower)
     }
 
     private fun cohesionForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {

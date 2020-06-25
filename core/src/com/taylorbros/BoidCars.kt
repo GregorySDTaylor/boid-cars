@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector2
 
 class BoidCars : ApplicationAdapter() {
 
-    val boidCount = 100
-    val maxSpeed = 5f
-    val maxAcceleration = 1f
+    val boidCount = 300
+    val maxSpeed = 3f
+    val maxAcceleration = 0.5f
     val localDistance = 100f
     val flockingPower = 1f
 
@@ -27,8 +27,11 @@ class BoidCars : ApplicationAdapter() {
                     MathUtils.random() * Gdx.graphics.width,
                     MathUtils.random() * Gdx.graphics.height
             )
-            var velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * maxSpeed)
-            boids.add(Bird(position, velocity, localDistance, flockingPower, maxSpeed, maxAcceleration))
+            val variableFlockingPower = (MathUtils.random() * flockingPower * 2 + 0.5 * flockingPower).toFloat()
+            val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
+            val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 2 + 0.5 * maxAcceleration).toFloat()
+            val velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
+            boids.add(Bird(position, velocity, localDistance, variableFlockingPower, variableMaxSpeed, variableMaxAcceleration))
         }
     }
 
