@@ -31,6 +31,8 @@ class Bird(
             acceleration.add(alignmentForce)
             acceleration.add(cohesionForce)
         }
+        val obstacleAvoidanceForce = obstacleAvoidanceForce(obstacles, localDistance)
+        acceleration.add(obstacleAvoidanceForce)
         if (acceleration.len() > maxAcceleration) {
             acceleration.setLength(maxAcceleration)
         }
@@ -122,6 +124,19 @@ class Bird(
         val rootProportionOfLocalDistance = proportionOfLocalDistance.pow(1/2)
         val cohesionForce = vectorToCenterOfMass.setLength(rootProportionOfLocalDistance)
         return cohesionForce.scl(flockingPower)
+    }
+
+    private fun obstacleAvoidanceForce(obstacles: Set<Obstacle>, localDistance: Float): Vector2 {
+        val avoidForce = Vector2()
+        obstacles.forEach {
+            val distance = this.position.dst(it.position)
+            if (distance < (this.size + it.size + localDistance)) {
+                val avoidMagnitude = 1 - (localDistance / (distance - this.size - it.size))
+                val avoidVector = this.position.cpy().sub(it.position).setLength(avoidMagnitude)
+                avoidForce.add(avoidVector)
+            }
+        }
+        return avoidForce
     }
 
     override fun render(shapeRenderer: ShapeRenderer) {

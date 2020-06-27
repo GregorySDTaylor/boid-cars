@@ -11,7 +11,7 @@ class BoidCars : ApplicationAdapter() {
 
     var shapeRenderer: ShapeRenderer? = null
 
-    val boidCount = 300
+    val boidCount = 50
     val boidSize = 5f
     val maxSpeed = 3f
     val maxAcceleration = 0.5f
@@ -19,9 +19,9 @@ class BoidCars : ApplicationAdapter() {
     val flockingPower = 1f
     val boids = mutableSetOf<Boid>()
 
-    val obstacleCount = 10
+    val obstacleCount = 3
     val minObstacleSize = 10f
-    val maxObstacleSize = 200f
+    val maxObstacleSize = 100f
     val obstacles = mutableSetOf<Obstacle>()
 
 
