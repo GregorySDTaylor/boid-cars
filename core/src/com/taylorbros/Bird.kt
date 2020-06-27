@@ -7,42 +7,52 @@ import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 class Bird(
+        override val size: Float,
         override val position: Vector2,
         override val velocity: Vector2,
         override val localDistance: Float,
         override val flockingPower: Float,
         private val maxSpeed: Float,
-        private val maxAcceleration: Float,
-        private val size: Float
+        private val maxAcceleration: Float
 ) : Boid, ShapeRenderable {
 
-    private val acceleration = Vector2()
-
-    override fun update(otherLocalBoids: Set<Boid>, obstacles: Set<Obstacle>) {
-        acceleration.setZero()
-        if (otherLocalBoids.isNotEmpty()) {
-            val separationForce = separationForce(otherLocalBoids, localDistance)
-            val alignmentForce = alignmentForce(otherLocalBoids)
-            val cohesionForce = cohesionForce(otherLocalBoids, localDistance)
-            val separationForceMagnitude = separationForce.len()
-            val alignmentForceMagnitude = alignmentForce.len()
-            val cohesionForceMagnitude = cohesionForce.len()
-            acceleration.add(separationForce)
-            acceleration.add(alignmentForce)
-            acceleration.add(cohesionForce)
+    override fun update(entities: Set<Any>) {
+        val desiredMovement = Vector2()
+        val localBoids = localBoidsFrom(entities)
+        if (localBoids.isNotEmpty()) {
+            desiredMovement.add(separationForce(localBoids))
+            desiredMovement.add(alignmentForce(localBoids))
+            desiredMovement.add(cohesionForce(localBoids))
         }
-        val obstacleAvoidanceForce = obstacleAvoidanceForce(obstacles, localDistance)
-        acceleration.add(obstacleAvoidanceForce)
-        if (acceleration.len() > maxAcceleration) {
-            acceleration.setLength(maxAcceleration)
+        val localObstacles = localObstaclesFrom(entities)
+        if (localObstacles.isNotEmpty()) {
+            desiredMovement.add(obstacleAvoidanceForce(localObstacles))
         }
-        velocity.add(acceleration)
+        if (desiredMovement.len() > maxAcceleration) {
+            desiredMovement.setLength(maxAcceleration)
+        }
+        velocity.add(desiredMovement)
         if (velocity.len() > maxSpeed) {
             velocity.setLength(maxSpeed)
         }
         position.add(velocity)
         reflectEdges()
-        reflectObstacles(obstacles)
+    }
+
+    private fun localObstaclesFrom(entities: Set<Any>): List<Obstacle> {
+        return entities.filter {
+            it is Obstacle
+                    && this != it
+                    && this.position.dst(it.position) + this.size + it.size < localDistance
+        }.map { it as Obstacle }
+    }
+
+    private fun localBoidsFrom(entities: Set<Any>): List<Boid> {
+        return entities.filter {
+            it is Boid
+                    && this != it
+                    && this.position.dst(it.position) + this.size + it.size < localDistance
+        }.map { it as Boid }
     }
 
     private fun reflectEdges() {
@@ -84,7 +94,7 @@ class Bird(
         }
     }
 
-    private fun separationForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {
+    private fun separationForce(otherLocalBoids: List<Boid>): Vector2 {
         val separationForce = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorAwayFromOther = this.position.cpy().sub(other.position)
@@ -98,7 +108,7 @@ class Bird(
         return separationForce.scl(flockingPower)
     }
 
-    private fun alignmentForce(otherLocalBoids: Set<Boid>): Vector2 {
+    private fun alignmentForce(otherLocalBoids: List<Boid>): Vector2 {
         val averageOtherVelocity = Vector2()
         otherLocalBoids.forEach { other ->
             averageOtherVelocity.add(other.velocity)
@@ -112,7 +122,7 @@ class Bird(
         return normalizedVelocityDifference.scl(flockingPower)
     }
 
-    private fun cohesionForce(otherLocalBoids: Set<Boid>, localDistance: Float): Vector2 {
+    private fun cohesionForce(otherLocalBoids: List<Boid>): Vector2 {
         val vectorToCenterOfMass = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorToOther = other.position.cpy().sub(this.position)
@@ -126,7 +136,7 @@ class Bird(
         return cohesionForce.scl(flockingPower)
     }
 
-    private fun obstacleAvoidanceForce(obstacles: Set<Obstacle>, localDistance: Float): Vector2 {
+    private fun obstacleAvoidanceForce(obstacles: List<Obstacle>): Vector2 {
         val avoidForce = Vector2()
         obstacles.forEach {
             val distance = this.position.dst(it.position)

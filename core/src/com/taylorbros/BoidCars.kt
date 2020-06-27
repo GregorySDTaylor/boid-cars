@@ -22,9 +22,8 @@ class BoidCars : ApplicationAdapter() {
     val obstacleCount = 3
     val minObstacleSize = 10f
     val maxObstacleSize = 100f
-    val obstacles = mutableSetOf<Obstacle>()
 
-    val shapeRenderables = mutableSetOf<ShapeRenderable>()
+    val entities = mutableSetOf<Any>()
 
     override fun create() {
         shapeRenderer = ShapeRenderer()
@@ -36,8 +35,7 @@ class BoidCars : ApplicationAdapter() {
             )
             val variableSize = MathUtils.random() * (maxObstacleSize - minObstacleSize) + minObstacleSize
             val obstacle = Obstacle(position, variableSize)
-            obstacles.add(obstacle)
-            shapeRenderables.add(obstacle)
+            entities.add(obstacle)
         }
         repeat(boidCount) {
             var position = Vector2(
@@ -49,27 +47,25 @@ class BoidCars : ApplicationAdapter() {
             val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 2 + 0.5 * maxAcceleration).toFloat()
             val velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
             val bird = Bird(
+                    boidSize,
                     position,
                     velocity,
                     localDistance,
                     variableFlockingPower,
                     variableMaxSpeed,
-                    variableMaxAcceleration,
-                    boidSize
+                    variableMaxAcceleration
             )
             boids.add(bird)
-            shapeRenderables.add(bird)
+            entities.add(bird)
         }
     }
 
     override fun render() {
-        boids.forEach {
-            val otherLocalBoids = findOtherLocalBoids(it)
-            it.update(otherLocalBoids, obstacles) }
+        entities.forEach { if (it is Updateable) it.update(entities) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         shapeRenderer!!.begin();
-        shapeRenderables.forEach { it.shapeRender(shapeRenderer!!) }
+        entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!) }
         shapeRenderer!!.end();
     }
 
