@@ -9,19 +9,32 @@ import com.badlogic.gdx.math.Vector2
 
 class BoidCars : ApplicationAdapter() {
 
+    var shapeRenderer: ShapeRenderer? = null
+
     val boidCount = 300
     val maxSpeed = 3f
     val maxAcceleration = 0.5f
     val localDistance = 100f
     val flockingPower = 1f
-
-    var shapeRenderer: ShapeRenderer? = null
     val boids = mutableSetOf<Boid>()
+
+    val obstacleCount = 10
+    val minObstacleSize = 10f
+    val maxObstacleSize = 200f
+    val obstacles = mutableSetOf<Obstacle>()
 
 
     override fun create() {
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
+        repeat(obstacleCount) {
+            var position = Vector2(
+                    MathUtils.random() * Gdx.graphics.width,
+                    MathUtils.random() * Gdx.graphics.height
+            )
+            val variableSize = MathUtils.random() * (maxObstacleSize - minObstacleSize) + minObstacleSize
+            obstacles.add(Obstacle(position, variableSize))
+        }
         repeat(boidCount) {
             var position = Vector2(
                     MathUtils.random() * Gdx.graphics.width,
@@ -42,6 +55,7 @@ class BoidCars : ApplicationAdapter() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         shapeRenderer!!.begin();
+        obstacles.forEach { it.render(shapeRenderer!!) }
         boids.forEach { it.render(shapeRenderer!!) }
         shapeRenderer!!.end();
     }
