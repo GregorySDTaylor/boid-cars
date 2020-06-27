@@ -12,12 +12,13 @@ class Bird(
         override val localDistance: Float,
         override val flockingPower: Float,
         private val maxSpeed: Float,
-        private val maxAcceleration: Float
+        private val maxAcceleration: Float,
+        private val size: Float
 ) : Boid {
 
     private val acceleration = Vector2()
 
-    override fun update(otherLocalBoids: Set<Boid>) {
+    override fun update(otherLocalBoids: Set<Boid>, obstacles: Set<Obstacle>) {
         acceleration.setZero()
         if (otherLocalBoids.isNotEmpty()) {
             val separationForce = separationForce(otherLocalBoids, localDistance)
@@ -39,6 +40,7 @@ class Bird(
         }
         position.add(velocity)
         reflectEdges()
+        reflectObstacles(obstacles)
     }
 
     private fun reflectEdges() {
@@ -53,6 +55,15 @@ class Bird(
         }
         if (position.y < 0) {
             velocity.y = velocity.y.absoluteValue
+        }
+    }
+
+    private fun reflectObstacles(obstacles: Set<Obstacle>) {
+        obstacles.forEach {
+            if (this.position.dst(it.position) < (it.size + this.size)) {
+                this.velocity.setAngle(this.position.cpy().sub(it.position).angle())
+                this.position.set(it.position.cpy().add(this.position.cpy().sub(it.position).setLength(it.size + this.size)))
+            }
         }
     }
 
@@ -116,7 +127,7 @@ class Bird(
     override fun render(shapeRenderer: ShapeRenderer) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
-        shapeRenderer.circle(position.x, position.y, 5f)
+        shapeRenderer.circle(position.x, position.y, size)
         shapeRenderer.setColor(0.7f, 0.7f, 0.7f, 1f)
         shapeRenderer.rectLine(position, position.cpy().add(velocity.cpy().scl(2f)), 3f)
     }

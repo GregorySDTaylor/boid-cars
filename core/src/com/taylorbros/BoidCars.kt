@@ -12,6 +12,7 @@ class BoidCars : ApplicationAdapter() {
     var shapeRenderer: ShapeRenderer? = null
 
     val boidCount = 300
+    val boidSize = 5f
     val maxSpeed = 3f
     val maxAcceleration = 0.5f
     val localDistance = 100f
@@ -44,14 +45,24 @@ class BoidCars : ApplicationAdapter() {
             val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
             val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 2 + 0.5 * maxAcceleration).toFloat()
             val velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
-            boids.add(Bird(position, velocity, localDistance, variableFlockingPower, variableMaxSpeed, variableMaxAcceleration))
+            boids.add(
+                    Bird(
+                            position,
+                            velocity,
+                            localDistance,
+                            variableFlockingPower,
+                            variableMaxSpeed,
+                            variableMaxAcceleration,
+                            boidSize
+                    )
+            )
         }
     }
 
     override fun render() {
         boids.forEach {
             val otherLocalBoids = findOtherLocalBoids(it)
-            it.update(otherLocalBoids) }
+            it.update(otherLocalBoids, obstacles) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         shapeRenderer!!.begin();

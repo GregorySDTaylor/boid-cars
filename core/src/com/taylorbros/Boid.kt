@@ -8,6 +8,6 @@ interface Boid {
     val velocity: Vector2
     val localDistance: Float
     val flockingPower: Float
-    fun update(otherLocalBoids: Set<Boid>)
+    fun update(otherLocalBoids: Set<Boid>, obstacles: Set<Obstacle>)
     fun render(shapeRenderer: ShapeRenderer)
 }
