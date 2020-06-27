@@ -24,6 +24,7 @@ class BoidCars : ApplicationAdapter() {
     val maxObstacleSize = 100f
     val obstacles = mutableSetOf<Obstacle>()
 
+    val shapeRenderables = mutableSetOf<ShapeRenderable>()
 
     override fun create() {
         shapeRenderer = ShapeRenderer()
@@ -34,7 +35,9 @@ class BoidCars : ApplicationAdapter() {
                     MathUtils.random() * Gdx.graphics.height
             )
             val variableSize = MathUtils.random() * (maxObstacleSize - minObstacleSize) + minObstacleSize
-            obstacles.add(Obstacle(position, variableSize))
+            val obstacle = Obstacle(position, variableSize)
+            obstacles.add(obstacle)
+            shapeRenderables.add(obstacle)
         }
         repeat(boidCount) {
             var position = Vector2(
@@ -45,17 +48,17 @@ class BoidCars : ApplicationAdapter() {
             val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
             val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 2 + 0.5 * maxAcceleration).toFloat()
             val velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
-            boids.add(
-                    Bird(
-                            position,
-                            velocity,
-                            localDistance,
-                            variableFlockingPower,
-                            variableMaxSpeed,
-                            variableMaxAcceleration,
-                            boidSize
-                    )
+            val bird = Bird(
+                    position,
+                    velocity,
+                    localDistance,
+                    variableFlockingPower,
+                    variableMaxSpeed,
+                    variableMaxAcceleration,
+                    boidSize
             )
+            boids.add(bird)
+            shapeRenderables.add(bird)
         }
     }
 
@@ -66,8 +69,7 @@ class BoidCars : ApplicationAdapter() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         shapeRenderer!!.begin();
-        obstacles.forEach { it.render(shapeRenderer!!) }
-        boids.forEach { it.render(shapeRenderer!!) }
+        shapeRenderables.forEach { it.shapeRender(shapeRenderer!!) }
         shapeRenderer!!.end();
     }
 

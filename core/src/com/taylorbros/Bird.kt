@@ -14,7 +14,7 @@ class Bird(
         private val maxSpeed: Float,
         private val maxAcceleration: Float,
         private val size: Float
-) : Boid {
+) : Boid, ShapeRenderable {
 
     private val acceleration = Vector2()
 
@@ -139,7 +139,7 @@ class Bird(
         return avoidForce
     }
 
-    override fun render(shapeRenderer: ShapeRenderer) {
+    override fun shapeRender(shapeRenderer: ShapeRenderer) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
         shapeRenderer.circle(position.x, position.y, size)

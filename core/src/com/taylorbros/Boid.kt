@@ -9,5 +9,4 @@ interface Boid {
     val localDistance: Float
     val flockingPower: Float
     fun update(otherLocalBoids: Set<Boid>, obstacles: Set<Obstacle>)
-    fun render(shapeRenderer: ShapeRenderer)
 }
