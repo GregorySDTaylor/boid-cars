@@ -79,16 +79,18 @@ class Bird(
         }
     }
 
-    private fun separationForce(otherLocalBoids: List<Boid>): Vector2 { // TODO refactor for clarity
+    private fun separationForce(otherLocalBoids: List<Boid>): Vector2 {
         val separationForce = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorAwayFromOther = this.position.cpy().sub(other.position)
             val distance = vectorAwayFromOther.len()
             val proportionOfLocalDistance = distance / localDistance
-            val squareProportionOfLocalDistance = proportionOfLocalDistance.pow(2)
-            val inverseProportionOfLocalDistance = 1 - squareProportionOfLocalDistance
+            val inverseProportionOfLocalDistance = 1 - proportionOfLocalDistance
             vectorAwayFromOther.setLength(inverseProportionOfLocalDistance)
             separationForce.add(vectorAwayFromOther)
+        }
+        if (separationForce.len() > 1f) {
+            separationForce.setLength(1f)
         }
         return separationForce.scl(flockingPower)
     }
