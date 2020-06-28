@@ -9,27 +9,27 @@ import com.badlogic.gdx.math.Vector2
 
 class BoidCars : ApplicationAdapter() {
 
-    var shapeRenderer: ShapeRenderer? = null
+    private var shapeRenderer: ShapeRenderer? = null
 
-    val boidCount = 300
-    val boidSize = 5f
-    val maxSpeed = 3f
-    val maxAcceleration = 0.5f
-    val localDistance = 100f
-    val flockingPower = 1f
-    val boids = mutableSetOf<Boid>()
+    private val boidCount = 300
+    private val boidSize = 5f
+    private val maxSpeed = 3f
+    private val maxAcceleration = 0.5f
+    private val localDistance = 100f
+    private val flockingPower = 1f
+    private val boids = mutableSetOf<Boid>()
 
-    val obstacleCount = 3
-    val minObstacleSize = 50f
-    val maxObstacleSize = 200f
+    private val obstacleCount = 3
+    private val minObstacleSize = 50f
+    private val maxObstacleSize = 200f
 
-    val entities = mutableSetOf<Any>()
+    private val entities = mutableSetOf<Any>()
 
     override fun create() {
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
         repeat(obstacleCount) {
-            var position = Vector2(
+            val position = Vector2(
                     MathUtils.random() * Gdx.graphics.width,
                     MathUtils.random() * Gdx.graphics.height
             )
@@ -38,7 +38,7 @@ class BoidCars : ApplicationAdapter() {
             entities.add(obstacle)
         }
         repeat(boidCount) {
-            var position = Vector2(
+            val position = Vector2(
                     MathUtils.random() * Gdx.graphics.width,
                     MathUtils.random() * Gdx.graphics.height
             )
@@ -64,19 +64,9 @@ class BoidCars : ApplicationAdapter() {
         entities.forEach { if (it is Updateable) it.update(entities) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        shapeRenderer!!.begin();
+        shapeRenderer!!.begin()
         entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!) }
-        shapeRenderer!!.end();
-    }
-
-    fun findOtherLocalBoids(principal : Boid) : Set<Boid> {
-        val otherLocalBoids = mutableSetOf<Boid>()
-        boids.forEach { target ->
-            if (principal != target && principal.position.dst(target.position) < localDistance) {
-                otherLocalBoids.add(target)
-            }
-        }
-        return otherLocalBoids
+        shapeRenderer!!.end()
     }
 
     override fun dispose() {

@@ -55,7 +55,7 @@ class Bird(
         }.map { it as Boid }
     }
 
-    private fun reflectEdges() {
+    private fun reflectEdges() {  // TODO implement this somewhere else as generalized collision
         if (position.x > Gdx.graphics.width) {
             velocity.x = - velocity.x.absoluteValue
         }
@@ -70,7 +70,7 @@ class Bird(
         }
     }
 
-    private fun reflectObstacles(obstacles: Set<Obstacle>) {
+    private fun reflectObstacles(obstacles: Set<Obstacle>) { // TODO implement this somewhere else as generalized collision
         obstacles.forEach {
             if (this.position.dst(it.position) < (it.size + this.size)) {
                 this.velocity.setAngle(this.position.cpy().sub(it.position).angle())
@@ -79,22 +79,7 @@ class Bird(
         }
     }
 
-    private fun wrapEdges() {
-        if (position.x > Gdx.graphics.width) {
-            position.x = 0f
-        }
-        if (position.y > Gdx.graphics.height) {
-            position.y = 0f
-        }
-        if (position.x < 0) {
-            position.x = Gdx.graphics.width.toFloat()
-        }
-        if (position.y < 0) {
-            position.y = Gdx.graphics.height.toFloat()
-        }
-    }
-
-    private fun separationForce(otherLocalBoids: List<Boid>): Vector2 {
+    private fun separationForce(otherLocalBoids: List<Boid>): Vector2 { // TODO refactor for clarity
         val separationForce = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorAwayFromOther = this.position.cpy().sub(other.position)
@@ -108,7 +93,7 @@ class Bird(
         return separationForce.scl(flockingPower)
     }
 
-    private fun alignmentForce(otherLocalBoids: List<Boid>): Vector2 {
+    private fun alignmentForce(otherLocalBoids: List<Boid>): Vector2 { // TODO refactor for clarity
         val averageOtherVelocity = Vector2()
         otherLocalBoids.forEach { other ->
             averageOtherVelocity.add(other.velocity)
@@ -122,7 +107,7 @@ class Bird(
         return normalizedVelocityDifference.scl(flockingPower)
     }
 
-    private fun cohesionForce(otherLocalBoids: List<Boid>): Vector2 {
+    private fun cohesionForce(otherLocalBoids: List<Boid>): Vector2 { // TODO refactor for clarity
         val vectorToCenterOfMass = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorToOther = other.position.cpy().sub(this.position)
