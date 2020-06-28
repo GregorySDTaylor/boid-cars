@@ -95,7 +95,7 @@ class Bird(
         return separationForce.scl(flockingPower)
     }
 
-    private fun alignmentForce(otherLocalBoids: List<Boid>): Vector2 { // TODO refactor for clarity
+    private fun alignmentForce(otherLocalBoids: List<Boid>): Vector2 {
         val averageOtherVelocity = Vector2()
         otherLocalBoids.forEach { other ->
             averageOtherVelocity.add(other.velocity)
@@ -109,17 +109,16 @@ class Bird(
         return normalizedVelocityDifference.scl(flockingPower)
     }
 
-    private fun cohesionForce(otherLocalBoids: List<Boid>): Vector2 { // TODO refactor for clarity
-        val vectorToCenterOfMass = Vector2()
+    private fun cohesionForce(otherLocalBoids: List<Boid>): Vector2 {
+        val sumOfVectorsToOthers = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorToOther = other.position.cpy().sub(this.position)
-            vectorToCenterOfMass.add(vectorToOther)
+            sumOfVectorsToOthers.add(vectorToOther)
         }
-        vectorToCenterOfMass.scl(1f / otherLocalBoids.count())
-        val distance = vectorToCenterOfMass.len()
+        val vectorToAverageOtherCenters = sumOfVectorsToOthers.scl(1f / otherLocalBoids.count())
+        val distance = vectorToAverageOtherCenters.len()
         val proportionOfLocalDistance = distance / localDistance
-        val rootProportionOfLocalDistance = proportionOfLocalDistance.pow(1/2)
-        val cohesionForce = vectorToCenterOfMass.setLength(rootProportionOfLocalDistance)
+        val cohesionForce = vectorToAverageOtherCenters.setLength(proportionOfLocalDistance)
         return cohesionForce.scl(flockingPower)
     }
 
