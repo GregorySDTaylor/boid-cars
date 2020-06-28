@@ -43,7 +43,7 @@ class Bird(
         return entities.filter {
             it is Obstacle
                     && this != it
-                    && this.position.dst(it.position) + this.size + it.size < localDistance
+                    && (this.position.dst(it.position) - this.size - it.size) < localDistance
         }.map { it as Obstacle }
     }
 
@@ -51,7 +51,7 @@ class Bird(
         return entities.filter {
             it is Boid
                     && this != it
-                    && this.position.dst(it.position) + this.size + it.size < localDistance
+                    && (this.position.dst(it.position) - this.size - it.size) < localDistance
         }.map { it as Boid }
     }
 
