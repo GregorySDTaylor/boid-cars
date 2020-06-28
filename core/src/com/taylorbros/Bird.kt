@@ -55,7 +55,7 @@ class Bird(
         }.map { it as Boid }
     }
 
-    private fun reflectEdges() {  // TODO implement this somewhere else as generalized collision
+    private fun reflectEdges() {  // TODO implement this somewhere else as generalized collision (box2d?)
         if (position.x > Gdx.graphics.width) {
             velocity.x = - velocity.x.absoluteValue
         }
@@ -70,7 +70,7 @@ class Bird(
         }
     }
 
-    private fun reflectObstacles(obstacles: Set<Obstacle>) { // TODO implement this somewhere else as generalized collision
+    private fun reflectObstacles(obstacles: Set<Obstacle>) { // TODO implement this somewhere else as generalized collision (box2d?)
         obstacles.forEach {
             if (this.position.dst(it.position) < (it.size + this.size)) {
                 this.velocity.setAngle(this.position.cpy().sub(it.position).angle())
@@ -79,36 +79,53 @@ class Bird(
         }
     }
 
+    // steer to avoid crowding local flockmates
     private fun separationForce(otherLocalBoids: List<Boid>): Vector2 {
         val separationForce = Vector2()
         otherLocalBoids.forEach { other ->
             val vectorAwayFromOther = this.position.cpy().sub(other.position)
+
+            // make separation force stronger for closer flockmates
             val distance = vectorAwayFromOther.len()
             val proportionOfLocalDistance = distance / localDistance
             val inverseProportionOfLocalDistance = 1 - proportionOfLocalDistance
             vectorAwayFromOther.setLength(inverseProportionOfLocalDistance)
+
             separationForce.add(vectorAwayFromOther)
         }
+
+        // separation force should never exceed 1
         if (separationForce.len() > 1f) {
             separationForce.setLength(1f)
         }
+
+        // scale separation force by the flockingPower
         return separationForce.scl(flockingPower)
     }
 
+    // steer towards the average heading of local flockmates
     private fun alignmentForce(otherLocalBoids: List<Boid>): Vector2 {
-        val averageOtherVelocity = Vector2()
+        val sumOfOtherVelocities = Vector2()
         otherLocalBoids.forEach { other ->
-            averageOtherVelocity.add(other.velocity)
+            sumOfOtherVelocities.add(other.velocity)
         }
-        val velocityDifference = averageOtherVelocity.sub(this.velocity)
+        val averageOfOtherVelocities = sumOfOtherVelocities.scl( 1f / otherLocalBoids.count() )
+
+        // make alignment force stronger when this boids heading is more different than the average heading
+        val velocityDifference = averageOfOtherVelocities.sub(this.velocity)
         val velocityDifferenceMagnitude = velocityDifference.len()
-        val averageOtherVelocityMagnitude = averageOtherVelocity.len()
+        val averageOtherVelocityMagnitude = averageOfOtherVelocities.len()
         val thisVelocityMagnitude = this.velocity.len()
+
+        // alignment force should never be greater than 1
         val normalizedMagnitude = velocityDifferenceMagnitude / (averageOtherVelocityMagnitude + thisVelocityMagnitude)
         val normalizedVelocityDifference = velocityDifference.setLength(normalizedMagnitude)
+
+        // scale alignment force by the flockingPower
         return normalizedVelocityDifference.scl(flockingPower)
     }
 
+    // steer to move towards the average position of local flockmates
     private fun cohesionForce(otherLocalBoids: List<Boid>): Vector2 {
         val sumOfVectorsToOthers = Vector2()
         otherLocalBoids.forEach { other ->
@@ -116,9 +133,13 @@ class Bird(
             sumOfVectorsToOthers.add(vectorToOther)
         }
         val vectorToAverageOtherCenters = sumOfVectorsToOthers.scl(1f / otherLocalBoids.count())
+
+        // cohesion force should never be greater than 1
         val distance = vectorToAverageOtherCenters.len()
         val proportionOfLocalDistance = distance / localDistance
         val cohesionForce = vectorToAverageOtherCenters.setLength(proportionOfLocalDistance)
+
+        // scale cohesion force by the flockingPower
         return cohesionForce.scl(flockingPower)
     }
 
