@@ -26,7 +26,7 @@ class BoidCars : ApplicationAdapter() {
     private val boidSize = 0.1f
     private val boidDensity = 10f
     private val maxSpeed = 5f
-    private val maxAcceleration = 1f
+    private val maxAcceleration = 3f
     private val localDistance = 1f
     private val flockingPower = 2f
     private val boids = mutableSetOf<Boid>()
@@ -94,7 +94,7 @@ class BoidCars : ApplicationAdapter() {
         box2dWorld.step(timeStep, velocityIterations, positionIterations)
         entities.forEach { if (it is Updateable) it.update(entities) }
 
-        targetAngle += 0.3f
+        targetAngle += 0.6f
         val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
         target.position.set(centerStage.cpy().add(offset))
 

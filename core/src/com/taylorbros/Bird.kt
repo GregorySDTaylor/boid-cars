@@ -40,7 +40,7 @@ class Bird(
 
     var desiredMovement = Vector2()
     var drag = Vector2()
-    val dragFactor = 0.1f
+    val dragFactor = 0.03f
 
     override fun update(entities: Set<Any>) {
         desiredMovement = Vector2()
@@ -168,7 +168,7 @@ class Bird(
 
     private fun targetsSeekingForce(targets: List<Target>): Vector2 {
         val seekingForce = Vector2()
-        val magnitude = 0.5f
+        val magnitude = 1f
         targets.forEach {
             val seekVector = it.position.cpy().sub(this.position).setLength(magnitude)
             seekingForce.add(seekVector)
@@ -182,19 +182,19 @@ class Bird(
         shapeRenderer.circle(body.position.x * pixelsPerMeter,
                 body.position.y * pixelsPerMeter,
                 size * pixelsPerMeter)
-        shapeRenderer.setColor(0.7f, 0.7f, 0.3f, 1f)
+//        shapeRenderer.setColor(0.7f, 0.7f, 0.3f, 1f)
         val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.5f))
-        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
-                body.position.y * pixelsPerMeter,
-                desiredMovementPosition.x * pixelsPerMeter,
-                desiredMovementPosition.y * pixelsPerMeter,
-                3f)
-        shapeRenderer.setColor(0.2f, 0.2f, 0.8f, 1f)
+//        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
+//                body.position.y * pixelsPerMeter,
+//                desiredMovementPosition.x * pixelsPerMeter,
+//                desiredMovementPosition.y * pixelsPerMeter,
+//                3f)
+//        shapeRenderer.setColor(0.2f, 0.2f, 0.8f, 1f)
         val dragPosition = body.position.cpy().add(drag.cpy().scl(0.5f))
-        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
-                body.position.y * pixelsPerMeter,
-                dragPosition.x * pixelsPerMeter,
-                dragPosition.y * pixelsPerMeter,
-                3f)
+//        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
+//                body.position.y * pixelsPerMeter,
+//                dragPosition.x * pixelsPerMeter,
+//                dragPosition.y * pixelsPerMeter,
+//                3f)
     }
 }
