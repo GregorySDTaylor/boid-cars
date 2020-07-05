@@ -12,6 +12,9 @@ import ktx.box2d.createWorld
 
 class BoidCars : ApplicationAdapter() {
 
+    private val shapeRender = false
+    private val debugRender = true
+
     private var shapeRenderer: ShapeRenderer? = null
 
     private val pixelsPerMeter = 50f
@@ -32,9 +35,9 @@ class BoidCars : ApplicationAdapter() {
     private val flockingPower = 10f
     private val boids = mutableSetOf<Boid>()
 
-    private val obstacleCount = 7
+    private val obstacleCount = 40
     private val minObstacleSize = 0.2f
-    private val maxObstacleSize = 1f
+    private val maxObstacleSize = 0.5f
 
     private val entities = mutableSetOf<Any>()
 
@@ -106,11 +109,15 @@ class BoidCars : ApplicationAdapter() {
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        shapeRenderer!!.projectionMatrix = camera.combined
-        shapeRenderer!!.begin()
-        entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!, pixelsPerMeter) }
-        shapeRenderer!!.end()
-        debugRenderer!!.render(box2dWorld, camera.combined)
+        if (shapeRender) {
+            shapeRenderer!!.projectionMatrix = camera.combined
+            shapeRenderer!!.begin()
+            entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!, pixelsPerMeter) }
+            shapeRenderer!!.end()
+        }
+        if (debugRender) {
+            debugRenderer!!.render(box2dWorld, camera.combined)
+        }
     }
 
     override fun dispose() {
