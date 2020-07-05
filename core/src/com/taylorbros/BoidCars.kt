@@ -3,8 +3,10 @@ package com.taylorbros
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.TimeUtils
 import ktx.box2d.createWorld
@@ -42,21 +44,26 @@ class BoidCars : ApplicationAdapter() {
     private var lesserAxis = 0f
     private var targetAngle = 0f
 
+    private var camera = OrthographicCamera()
+    private var debugMatrix = Matrix4()
+
     override fun create() {
+        stageWidth = Gdx.graphics.width / pixelsPerMeter
+        stageHeight = Gdx.graphics.height / pixelsPerMeter
+        camera = OrthographicCamera(stageWidth, stageHeight)
+
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
 
-        stageWidth = Gdx.graphics.width / pixelsPerMeter
-        stageHeight = Gdx.graphics.height / pixelsPerMeter
-        centerStage.set(stageWidth/2, stageHeight/2)
+        centerStage.set(0f, 0f)
         lesserAxis = if (stageWidth < stageHeight) stageWidth else stageHeight
 
         val boundingWalls = BoundingWalls(stageWidth, stageHeight, box2dWorld)
 
         repeat(obstacleCount) {
             val position = Vector2(
-                    MathUtils.random() * stageWidth,
-                    MathUtils.random() * stageHeight
+                    MathUtils.random() * stageWidth - stageWidth/2,
+                    MathUtils.random() * stageHeight - stageHeight/2
             )
             val variableSize = MathUtils.random() * (maxObstacleSize - minObstacleSize) + minObstacleSize
             val obstacle = Obstacle(position, variableSize, box2dWorld)
@@ -64,8 +71,8 @@ class BoidCars : ApplicationAdapter() {
         }
         repeat(boidCount) {
             val position = Vector2(
-                    MathUtils.random() * stageWidth,
-                    MathUtils.random() * stageHeight
+                    MathUtils.random() * stageWidth - stageWidth/2,
+                    MathUtils.random() * stageHeight - stageHeight/2
             )
             val variableFlockingPower = (MathUtils.random() * flockingPower * 2 + 0.5 * flockingPower).toFloat()
             val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
@@ -100,6 +107,7 @@ class BoidCars : ApplicationAdapter() {
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        shapeRenderer!!.projectionMatrix = camera.combined
         shapeRenderer!!.begin()
         entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!, pixelsPerMeter) }
         shapeRenderer!!.end()

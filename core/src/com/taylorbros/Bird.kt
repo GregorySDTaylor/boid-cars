@@ -2,10 +2,12 @@ package com.taylorbros
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ktx.box2d.circle
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
+import ktx.box2d.polygon
 import kotlin.math.pow
 
 class Bird(
@@ -27,6 +29,9 @@ class Bird(
             restitution = 0.2f
             density = initialDensity
         }
+        polygon(Vector2(-size, 0f),
+                Vector2(0f, size*2),
+                Vector2(size, 0f))
     }
     init {
         body.linearVelocity = initialVelocity
@@ -38,10 +43,10 @@ class Bird(
     override val velocity: Vector2
         get() = this.body.linearVelocity
 
-    var desiredMovement = Vector2()
-    var drag = Vector2()
-    val dragFactor = 0.04f
-    val avoidFactor = 10f
+    private var desiredMovement = Vector2()
+    private var drag = Vector2()
+    private val dragFactor = 0.04f
+    private val avoidFactor = 10f
 
     override fun update(entities: Set<Any>) {
         desiredMovement = Vector2()
@@ -178,20 +183,25 @@ class Bird(
     }
 
     override fun shapeRender(shapeRenderer: ShapeRenderer, pixelsPerMeter: Float) {
+        shapeRenderer.identity()
+        shapeRenderer.translate(position.x, position.y, 0f)
+        shapeRenderer.rotate(0f, 0f, 1f, MathUtils.radiansToDegrees * body.angle)
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
-        shapeRenderer.circle(body.position.x * pixelsPerMeter,
-                body.position.y * pixelsPerMeter,
-                size * pixelsPerMeter)
+        val bodySizeInPixels = size * pixelsPerMeter
+        shapeRenderer.circle(0f, 0f, size, 8)
+        shapeRenderer.triangle(-size, 0f,
+                0f, size * 2,
+                size, 0f)
 //        shapeRenderer.setColor(0.7f, 0.7f, 0.3f, 1f)
-        val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.5f))
+//        val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.5f))
 //        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
 //                body.position.y * pixelsPerMeter,
 //                desiredMovementPosition.x * pixelsPerMeter,
 //                desiredMovementPosition.y * pixelsPerMeter,
 //                3f)
 //        shapeRenderer.setColor(0.2f, 0.2f, 0.8f, 1f)
-        val dragPosition = body.position.cpy().add(drag.cpy().scl(0.5f))
+//        val dragPosition = body.position.cpy().add(drag.cpy().scl(0.5f))
 //        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
 //                body.position.y * pixelsPerMeter,
 //                dragPosition.x * pixelsPerMeter,

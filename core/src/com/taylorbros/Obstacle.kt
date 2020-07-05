@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
-import ktx.box2d.chain
 import ktx.box2d.circle
 
 class Obstacle(initialPosition: Vector2, val size: Float, world: World) : ShapeRenderable {
@@ -20,10 +19,10 @@ class Obstacle(initialPosition: Vector2, val size: Float, world: World) : ShapeR
         get() = this.body.position
 
     override fun shapeRender(shapeRenderer: ShapeRenderer, pixelsPerMeter: Float) {
+        shapeRenderer.identity()
+        shapeRenderer.translate(body.position.x, body.position.y, 0f)
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.2f, 0.2f, 1f)
-        shapeRenderer.circle(body.position.x * pixelsPerMeter,
-                body.position.y * pixelsPerMeter,
-                size * pixelsPerMeter)
+        shapeRenderer.circle(0f,0f, size, 64)
     }
 }
