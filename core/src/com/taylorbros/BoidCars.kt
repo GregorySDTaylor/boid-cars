@@ -13,12 +13,15 @@ class BoidCars : ApplicationAdapter() {
     private var shapeRenderer: ShapeRenderer? = null
 
     private val pixelsPerMeter = 50f
-    var stageWidth: Float = 1f
-    var stageHeight: Float = 1f
+    private var stageWidth: Float = 1f
+    private var stageHeight: Float = 1f
+    var timeStep = 1.0f / 60.0f // TODO figure out relationship between frame rate and physics simulation rate
+    var velocityIterations = 8
+    var positionIterations = 3
 
     private val world = createWorld()
 
-    private val boidCount = 800
+    private val boidCount = 80
     private val boidSize = 0.1f
     private val maxSpeed = 0.2f
     private val maxAcceleration = 0.01f
@@ -64,7 +67,8 @@ class BoidCars : ApplicationAdapter() {
                     localDistance,
                     variableFlockingPower,
                     variableMaxSpeed,
-                    variableMaxAcceleration
+                    variableMaxAcceleration,
+                    world
             )
             boids.add(bird)
             entities.add(bird)
@@ -72,6 +76,8 @@ class BoidCars : ApplicationAdapter() {
     }
 
     override fun render() {
+        world.step(timeStep, velocityIterations, positionIterations)
+
         entities.forEach { if (it is Updateable) it.update(entities) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -81,6 +87,7 @@ class BoidCars : ApplicationAdapter() {
     }
 
     override fun dispose() {
+        world.dispose()
         shapeRenderer!!.dispose()
     }
 }

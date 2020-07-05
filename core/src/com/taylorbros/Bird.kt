@@ -3,8 +3,11 @@ package com.taylorbros
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.World
+import ktx.box2d.body
+import ktx.box2d.circle
 import kotlin.math.absoluteValue
-import kotlin.math.pow
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
 
 class Bird(
         override val size: Float,
@@ -13,8 +16,19 @@ class Bird(
         override val localDistance: Float,
         override val flockingPower: Float,
         private val maxSpeed: Float,
-        private val maxAcceleration: Float
+        private val maxAcceleration: Float,
+        private val world: World
 ) : Boid, ShapeRenderable {
+
+    // set up box2d physics body
+    val body = world.body {
+        type = DynamicBody
+        position.set(position.x, position.y)
+        circle(radius = size) {
+            restitution = 0.2f
+            density = 25f
+        }
+    }
 
     override fun update(entities: Set<Any>) {
         val desiredMovement = Vector2()
