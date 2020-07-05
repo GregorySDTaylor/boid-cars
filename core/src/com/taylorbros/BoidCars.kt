@@ -23,10 +23,11 @@ class BoidCars : ApplicationAdapter() {
 
     private val boidCount = 80
     private val boidSize = 0.1f
-    private val maxSpeed = 0.2f
-    private val maxAcceleration = 0.01f
+    private val boidDensity = 10f
+    private val maxSpeed = 2f
+    private val maxAcceleration = 5f
     private val localDistance = 1f
-    private val flockingPower = 1f
+    private val flockingPower = 10f
     private val boids = mutableSetOf<Boid>()
 
     private val obstacleCount = 3
@@ -59,14 +60,14 @@ class BoidCars : ApplicationAdapter() {
             val variableFlockingPower = (MathUtils.random() * flockingPower * 2 + 0.5 * flockingPower).toFloat()
             val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
             val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 2 + 0.5 * maxAcceleration).toFloat()
-            val velocity = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
+            val initialImpulse = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
             val bird = Bird(
                     boidSize,
+                    boidDensity,
                     position,
-                    velocity,
+                    initialImpulse,
                     localDistance,
                     variableFlockingPower,
-                    variableMaxSpeed,
                     variableMaxAcceleration,
                     world
             )
@@ -77,7 +78,6 @@ class BoidCars : ApplicationAdapter() {
 
     override fun render() {
         world.step(timeStep, velocityIterations, positionIterations)
-
         entities.forEach { if (it is Updateable) it.update(entities) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)

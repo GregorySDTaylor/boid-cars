@@ -11,24 +11,30 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
 
 class Bird(
         override val size: Float,
-        override val position: Vector2,
+        val initialDensity: Float,
+        initialPosition: Vector2,
         override val velocity: Vector2,
         override val localDistance: Float,
         override val flockingPower: Float,
-        private val maxSpeed: Float,
         private val maxAcceleration: Float,
-        private val world: World
+        world: World
 ) : Boid, ShapeRenderable {
 
     // set up box2d physics body
-    val body = world.body {
+    private val body = world.body {
         type = DynamicBody
-        position.set(position.x, position.y)
+        position.set(initialPosition.x, initialPosition.y)
         circle(radius = size) {
             restitution = 0.2f
-            density = 25f
+            density = initialDensity
         }
     }
+    init {
+        body.linearVelocity = velocity
+    }
+
+    override val position: Vector2
+        get() = this.body.position
 
     override fun update(entities: Set<Any>) {
         val desiredMovement = Vector2()
@@ -45,12 +51,7 @@ class Bird(
         if (desiredMovement.len() > maxAcceleration) {
             desiredMovement.setLength(maxAcceleration)
         }
-        velocity.add(desiredMovement)
-        if (velocity.len() > maxSpeed) {
-            velocity.setLength(maxSpeed)
-        }
-        position.add(velocity)
-        reflectEdges()
+        body.applyForceToCenter(desiredMovement, true)
     }
 
     private fun localObstaclesFrom(entities: Set<Any>): List<Obstacle> {
@@ -173,13 +174,15 @@ class Bird(
     override fun shapeRender(shapeRenderer: ShapeRenderer, pixelsPerMeter: Float) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
-        shapeRenderer.circle(position.x * pixelsPerMeter, position.y * pixelsPerMeter, size * pixelsPerMeter)
+        shapeRenderer.circle(body.position.x * pixelsPerMeter,
+                body.position.y * pixelsPerMeter,
+                size * pixelsPerMeter)
         shapeRenderer.setColor(0.7f, 0.7f, 0.7f, 1f)
-        val velocityPosition = position.cpy().add(velocity.cpy().scl(2f))
-        shapeRenderer.rectLine(position.x * pixelsPerMeter,
-                position.y * pixelsPerMeter,
-                velocityPosition.x * pixelsPerMeter,
-                velocityPosition.y * pixelsPerMeter,
-                3f)
+//        val velocityPosition = body.position.cpy().add(velocity.cpy().scl(2f))
+//        shapeRenderer.rectLine(position.x * pixelsPerMeter,
+//                position.y * pixelsPerMeter,
+//                velocityPosition.x * pixelsPerMeter,
+//                velocityPosition.y * pixelsPerMeter,
+//                3f)
     }
 }
