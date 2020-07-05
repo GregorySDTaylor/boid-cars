@@ -19,7 +19,7 @@ class BoidCars : ApplicationAdapter() {
     var velocityIterations = 8
     var positionIterations = 3
 
-    private val world = createWorld()
+    private val box2dWorld = createWorld()
 
     private val boidCount = 80
     private val boidSize = 0.1f
@@ -42,6 +42,8 @@ class BoidCars : ApplicationAdapter() {
 
         stageWidth = Gdx.graphics.width / pixelsPerMeter
         stageHeight = Gdx.graphics.height / pixelsPerMeter
+
+        val boundingWalls = BoundingWalls(stageWidth, stageHeight, box2dWorld)
 
         repeat(obstacleCount) {
             val position = Vector2(
@@ -69,7 +71,7 @@ class BoidCars : ApplicationAdapter() {
                     localDistance,
                     variableFlockingPower,
                     variableMaxAcceleration,
-                    world
+                    box2dWorld
             )
             boids.add(bird)
             entities.add(bird)
@@ -77,7 +79,7 @@ class BoidCars : ApplicationAdapter() {
     }
 
     override fun render() {
-        world.step(timeStep, velocityIterations, positionIterations)
+        box2dWorld.step(timeStep, velocityIterations, positionIterations)
         entities.forEach { if (it is Updateable) it.update(entities) }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -87,7 +89,7 @@ class BoidCars : ApplicationAdapter() {
     }
 
     override fun dispose() {
-        world.dispose()
+        box2dWorld.dispose()
         shapeRenderer!!.dispose()
     }
 }

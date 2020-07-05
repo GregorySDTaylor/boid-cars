@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
 
 class Bird(
         override val size: Float,
-        val initialDensity: Float,
+        initialDensity: Float,
         initialPosition: Vector2,
         override val velocity: Vector2,
         override val localDistance: Float,
