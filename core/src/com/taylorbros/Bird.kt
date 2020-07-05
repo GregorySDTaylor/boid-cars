@@ -40,7 +40,8 @@ class Bird(
 
     var desiredMovement = Vector2()
     var drag = Vector2()
-    val dragFactor = 0.03f
+    val dragFactor = 0.04f
+    val avoidFactor = 10f
 
     override fun update(entities: Set<Any>) {
         desiredMovement = Vector2()
@@ -159,7 +160,7 @@ class Bird(
             val distance = this.position.dst(it.position)
             if (distance < (this.size + it.size + localDistance)) {
                 val avoidMagnitude = 1 - (localDistance / (distance - this.size - it.size))
-                val avoidVector = this.position.cpy().sub(it.position).setLength(avoidMagnitude)
+                val avoidVector = this.position.cpy().sub(it.position).setLength(avoidMagnitude * avoidFactor)
                 avoidForce.add(avoidVector)
             }
         }
@@ -168,7 +169,7 @@ class Bird(
 
     private fun targetsSeekingForce(targets: List<Target>): Vector2 {
         val seekingForce = Vector2()
-        val magnitude = 1f
+        val magnitude = 5f
         targets.forEach {
             val seekVector = it.position.cpy().sub(this.position).setLength(magnitude)
             seekingForce.add(seekVector)

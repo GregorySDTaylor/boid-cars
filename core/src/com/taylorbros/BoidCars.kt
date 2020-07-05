@@ -25,15 +25,15 @@ class BoidCars : ApplicationAdapter() {
     private val boidCount = 200
     private val boidSize = 0.1f
     private val boidDensity = 10f
-    private val maxSpeed = 5f
-    private val maxAcceleration = 3f
-    private val localDistance = 1f
-    private val flockingPower = 2f
+    private val maxSpeed = 10f
+    private val maxAcceleration = 10f
+    private val localDistance = 1.5f
+    private val flockingPower = 10f
     private val boids = mutableSetOf<Boid>()
 
-    private val obstacleCount = 3
+    private val obstacleCount = 7
     private val minObstacleSize = 0.2f
-    private val maxObstacleSize = 5f
+    private val maxObstacleSize = 1f
 
     private val entities = mutableSetOf<Any>()
 
@@ -69,7 +69,7 @@ class BoidCars : ApplicationAdapter() {
             )
             val variableFlockingPower = (MathUtils.random() * flockingPower * 2 + 0.5 * flockingPower).toFloat()
             val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
-            val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 2 + 0.5 * maxAcceleration).toFloat()
+            val variableMaxAcceleration = (MathUtils.random() * maxAcceleration * 0.9 + 0.1 * maxAcceleration).toFloat()
             val initialImpulse = Vector2().setToRandomDirection().setLength(MathUtils.random() * variableMaxSpeed)
             val bird = Bird(
                     boidSize,
@@ -94,7 +94,7 @@ class BoidCars : ApplicationAdapter() {
         box2dWorld.step(timeStep, velocityIterations, positionIterations)
         entities.forEach { if (it is Updateable) it.update(entities) }
 
-        targetAngle += 0.6f
+        targetAngle += 1f
         val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
         target.position.set(centerStage.cpy().add(offset))
 
