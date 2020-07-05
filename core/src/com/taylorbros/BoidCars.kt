@@ -12,19 +12,23 @@ class BoidCars : ApplicationAdapter() {
 
     private var shapeRenderer: ShapeRenderer? = null
 
+    private val pixelsPerMeter = 50f
+    var stageWidth: Float = 1f
+    var stageHeight: Float = 1f
+
     private val world = createWorld()
 
     private val boidCount = 800
-    private val boidSize = 5f
-    private val maxSpeed = 3f
-    private val maxAcceleration = 0.5f
-    private val localDistance = 40f
+    private val boidSize = 0.1f
+    private val maxSpeed = 0.2f
+    private val maxAcceleration = 0.01f
+    private val localDistance = 1f
     private val flockingPower = 1f
     private val boids = mutableSetOf<Boid>()
 
     private val obstacleCount = 3
-    private val minObstacleSize = 50f
-    private val maxObstacleSize = 200f
+    private val minObstacleSize = 0.2f
+    private val maxObstacleSize = 5f
 
     private val entities = mutableSetOf<Any>()
 
@@ -32,10 +36,13 @@ class BoidCars : ApplicationAdapter() {
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
 
+        stageWidth = Gdx.graphics.width / pixelsPerMeter
+        stageHeight = Gdx.graphics.height / pixelsPerMeter
+
         repeat(obstacleCount) {
             val position = Vector2(
-                    MathUtils.random() * Gdx.graphics.width,
-                    MathUtils.random() * Gdx.graphics.height
+                    MathUtils.random() * stageWidth,
+                    MathUtils.random() * stageHeight
             )
             val variableSize = MathUtils.random() * (maxObstacleSize - minObstacleSize) + minObstacleSize
             val obstacle = Obstacle(position, variableSize)
@@ -43,8 +50,8 @@ class BoidCars : ApplicationAdapter() {
         }
         repeat(boidCount) {
             val position = Vector2(
-                    MathUtils.random() * Gdx.graphics.width,
-                    MathUtils.random() * Gdx.graphics.height
+                    MathUtils.random() * stageWidth,
+                    MathUtils.random() * stageHeight
             )
             val variableFlockingPower = (MathUtils.random() * flockingPower * 2 + 0.5 * flockingPower).toFloat()
             val variableMaxSpeed = (MathUtils.random() * maxSpeed * 2 + 0.5 * maxSpeed).toFloat()
@@ -69,7 +76,7 @@ class BoidCars : ApplicationAdapter() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         shapeRenderer!!.begin()
-        entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!) }
+        entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!, pixelsPerMeter) }
         shapeRenderer!!.end()
     }
 

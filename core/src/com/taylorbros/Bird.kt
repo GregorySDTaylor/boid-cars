@@ -156,11 +156,16 @@ class Bird(
         return avoidForce
     }
 
-    override fun shapeRender(shapeRenderer: ShapeRenderer) {
+    override fun shapeRender(shapeRenderer: ShapeRenderer, pixelsPerMeter: Float) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
-        shapeRenderer.circle(position.x, position.y, size)
+        shapeRenderer.circle(position.x * pixelsPerMeter, position.y * pixelsPerMeter, size * pixelsPerMeter)
         shapeRenderer.setColor(0.7f, 0.7f, 0.7f, 1f)
-        shapeRenderer.rectLine(position, position.cpy().add(velocity.cpy().scl(2f)), 3f)
+        val velocityPosition = position.cpy().add(velocity.cpy().scl(2f))
+        shapeRenderer.rectLine(position.x * pixelsPerMeter,
+                position.y * pixelsPerMeter,
+                velocityPosition.x * pixelsPerMeter,
+                velocityPosition.y * pixelsPerMeter,
+                3f)
     }
 }
