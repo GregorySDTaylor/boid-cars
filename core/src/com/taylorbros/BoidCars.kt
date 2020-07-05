@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.utils.TimeUtils
 import ktx.box2d.createWorld
 
@@ -45,13 +46,13 @@ class BoidCars : ApplicationAdapter() {
     private var targetAngle = 0f
 
     private var camera = OrthographicCamera()
-    private var debugMatrix = Matrix4()
+    private var debugRenderer: Box2DDebugRenderer? = null
 
     override fun create() {
         stageWidth = Gdx.graphics.width / pixelsPerMeter
         stageHeight = Gdx.graphics.height / pixelsPerMeter
         camera = OrthographicCamera(stageWidth, stageHeight)
-
+        debugRenderer = Box2DDebugRenderer()
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
 
@@ -111,6 +112,7 @@ class BoidCars : ApplicationAdapter() {
         shapeRenderer!!.begin()
         entities.forEach { if (it is ShapeRenderable) it.shapeRender(shapeRenderer!!, pixelsPerMeter) }
         shapeRenderer!!.end()
+        debugRenderer!!.render(box2dWorld, camera.combined)
     }
 
     override fun dispose() {
