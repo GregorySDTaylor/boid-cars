@@ -24,10 +24,10 @@ class BoidCars : ApplicationAdapter() {
     private val boidCount = 200
     private val boidSize = 0.1f
     private val boidDensity = 10f
-    private val maxSpeed = 2f
+    private val maxSpeed = 5f
     private val maxAcceleration = 5f
     private val localDistance = 1f
-    private val flockingPower = 10f
+    private val flockingPower = 2f
     private val boids = mutableSetOf<Boid>()
 
     private val obstacleCount = 3

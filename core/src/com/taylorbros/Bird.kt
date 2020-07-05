@@ -13,7 +13,7 @@ class Bird(
         override val size: Float,
         initialDensity: Float,
         initialPosition: Vector2,
-        override val velocity: Vector2,
+        initialVelocity: Vector2,
         override val localDistance: Float,
         override val flockingPower: Float,
         private val maxAcceleration: Float,
@@ -36,8 +36,13 @@ class Bird(
     override val position: Vector2
         get() = this.body.position
 
+    override val velocity: Vector2
+        get() = this.body.linearVelocity
+
+    var desiredMovement = Vector2()
+
     override fun update(entities: Set<Any>) {
-        val desiredMovement = Vector2()
+        desiredMovement = Vector2()
         val localBoids = localBoidsFrom(entities)
         if (localBoids.isNotEmpty()) {
             desiredMovement.add(separationForce(localBoids))
@@ -68,30 +73,6 @@ class Bird(
                     && this != it
                     && (this.position.dst(it.position) - this.size - it.size) < localDistance
         }.map { it as Boid }
-    }
-
-    private fun reflectEdges() {  // TODO implement this somewhere else as generalized collision (box2d?)
-        if (position.x > Gdx.graphics.width) {
-            velocity.x = - velocity.x.absoluteValue
-        }
-        if (position.y > Gdx.graphics.height) {
-            velocity.y = - velocity.y.absoluteValue
-        }
-        if (position.x < 0) {
-            velocity.x = velocity.x.absoluteValue
-        }
-        if (position.y < 0) {
-            velocity.y = velocity.y.absoluteValue
-        }
-    }
-
-    private fun reflectObstacles(obstacles: Set<Obstacle>) { // TODO implement this somewhere else as generalized collision (box2d?)
-        obstacles.forEach {
-            if (this.position.dst(it.position) < (it.size + this.size)) {
-                this.velocity.setAngle(this.position.cpy().sub(it.position).angle())
-                this.position.set(it.position.cpy().add(this.position.cpy().sub(it.position).setLength(it.size + this.size)))
-            }
-        }
     }
 
     // steer to avoid crowding local flockmates
@@ -178,11 +159,11 @@ class Bird(
                 body.position.y * pixelsPerMeter,
                 size * pixelsPerMeter)
         shapeRenderer.setColor(0.7f, 0.7f, 0.7f, 1f)
-//        val velocityPosition = body.position.cpy().add(velocity.cpy().scl(2f))
-//        shapeRenderer.rectLine(position.x * pixelsPerMeter,
-//                position.y * pixelsPerMeter,
-//                velocityPosition.x * pixelsPerMeter,
-//                velocityPosition.y * pixelsPerMeter,
-//                3f)
+        val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.1f))
+        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
+                body.position.y * pixelsPerMeter,
+                desiredMovementPosition.x * pixelsPerMeter,
+                desiredMovementPosition.y * pixelsPerMeter,
+                3f)
     }
 }
