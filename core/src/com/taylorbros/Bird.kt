@@ -1,13 +1,12 @@
 package com.taylorbros
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ktx.box2d.circle
-import kotlin.math.absoluteValue
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
+import kotlin.math.pow
 
 class Bird(
         override val size: Float,
@@ -40,6 +39,8 @@ class Bird(
         get() = this.body.linearVelocity
 
     var desiredMovement = Vector2()
+    var drag = Vector2()
+    val dragFactor = 0.1f
 
     override fun update(entities: Set<Any>) {
         desiredMovement = Vector2()
@@ -61,6 +62,15 @@ class Bird(
             desiredMovement.setLength(maxAcceleration)
         }
         body.applyForceToCenter(desiredMovement, true)
+
+        drag = dragForce()
+        body.applyForceToCenter(drag, true)
+    }
+
+    private fun dragForce(): Vector2 {
+        val magnitude = this.body.linearVelocity.len().pow(2) * dragFactor
+        val dragVector = this.body.linearVelocity.cpy().rotate(180f)
+        return dragVector.setLength(magnitude)
     }
 
     private fun localObstaclesFrom(entities: Set<Any>): List<Obstacle> {
@@ -172,12 +182,19 @@ class Bird(
         shapeRenderer.circle(body.position.x * pixelsPerMeter,
                 body.position.y * pixelsPerMeter,
                 size * pixelsPerMeter)
-        shapeRenderer.setColor(0.7f, 0.7f, 0.7f, 1f)
-        val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.1f))
+        shapeRenderer.setColor(0.7f, 0.7f, 0.3f, 1f)
+        val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.5f))
         shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
                 body.position.y * pixelsPerMeter,
                 desiredMovementPosition.x * pixelsPerMeter,
                 desiredMovementPosition.y * pixelsPerMeter,
+                3f)
+        shapeRenderer.setColor(0.2f, 0.2f, 0.8f, 1f)
+        val dragPosition = body.position.cpy().add(drag.cpy().scl(0.5f))
+        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
+                body.position.y * pixelsPerMeter,
+                dragPosition.x * pixelsPerMeter,
+                dragPosition.y * pixelsPerMeter,
                 3f)
     }
 }
