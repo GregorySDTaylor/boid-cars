@@ -8,6 +8,7 @@ import ktx.box2d.body
 import ktx.box2d.circle
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
 import ktx.box2d.polygon
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 class Bird(
@@ -25,13 +26,14 @@ class Bird(
     private val body = world.body {
         type = DynamicBody
         position.set(initialPosition.x, initialPosition.y)
+        angle = initialVelocity.angleRad()
         circle(radius = size) {
             restitution = 0.2f
             density = initialDensity
         }
-        polygon(Vector2(-size, 0f),
-                Vector2(0f, size*2),
-                Vector2(size, 0f))
+        polygon(Vector2(0f, size),
+                Vector2(size * 2, 0f),
+                Vector2(0f, -size))
     }
     init {
         body.linearVelocity = initialVelocity
@@ -47,6 +49,8 @@ class Bird(
     private var drag = Vector2()
     private val dragFactor = 0.04f
     private val avoidFactor = 10f
+    private val torqueFactor = 0.1f
+    private val rotationalDragFactor = 0.05f
 
     override fun update(entities: Set<Any>) {
         desiredMovement = Vector2()
@@ -68,9 +72,25 @@ class Bird(
             desiredMovement.setLength(maxAcceleration)
         }
         body.applyForceToCenter(desiredMovement, true)
-
         drag = dragForce()
         body.applyForceToCenter(drag, true)
+        val angularVelocity = body.angularVelocity
+        val torque = rotateIntoVelocity()
+        body.applyTorque(torque, true)
+        val rotationalDrag = rotationalDrag()
+        body.applyTorque(rotationalDrag, true)
+    }
+
+    private fun rotationalDrag(): Float {
+        val dragMagnitude = (rotationalDragFactor * body.angularVelocity).pow(2)
+        return if (body.angularVelocity < 0) dragMagnitude else -dragMagnitude
+    }
+
+    private fun rotateIntoVelocity(): Float {
+        val currentOrientation = Vector2(1f, 0f).setAngleRad(body.angle)
+        val desiredOrientation = this.body.linearVelocity
+        val difference = currentOrientation.angleRad(desiredOrientation)
+        return torqueFactor * difference
     }
 
     private fun dragForce(): Vector2 {
@@ -188,24 +208,9 @@ class Bird(
         shapeRenderer.rotate(0f, 0f, 1f, MathUtils.radiansToDegrees * body.angle)
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1f)
-        val bodySizeInPixels = size * pixelsPerMeter
         shapeRenderer.circle(0f, 0f, size, 8)
-        shapeRenderer.triangle(-size, 0f,
-                0f, size * 2,
-                size, 0f)
-//        shapeRenderer.setColor(0.7f, 0.7f, 0.3f, 1f)
-//        val desiredMovementPosition = body.position.cpy().add(desiredMovement.cpy().scl(0.5f))
-//        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
-//                body.position.y * pixelsPerMeter,
-//                desiredMovementPosition.x * pixelsPerMeter,
-//                desiredMovementPosition.y * pixelsPerMeter,
-//                3f)
-//        shapeRenderer.setColor(0.2f, 0.2f, 0.8f, 1f)
-//        val dragPosition = body.position.cpy().add(drag.cpy().scl(0.5f))
-//        shapeRenderer.rectLine(body.position.x * pixelsPerMeter,
-//                body.position.y * pixelsPerMeter,
-//                dragPosition.x * pixelsPerMeter,
-//                dragPosition.y * pixelsPerMeter,
-//                3f)
+        shapeRenderer.triangle(0f, size,
+                size*2, 0f,
+                0f, -size)
     }
 }
