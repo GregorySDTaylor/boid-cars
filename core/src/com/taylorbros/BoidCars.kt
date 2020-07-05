@@ -6,10 +6,13 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import ktx.box2d.createWorld
 
 class BoidCars : ApplicationAdapter() {
 
     private var shapeRenderer: ShapeRenderer? = null
+
+    private val world = createWorld()
 
     private val boidCount = 800
     private val boidSize = 5f
@@ -28,6 +31,7 @@ class BoidCars : ApplicationAdapter() {
     override fun create() {
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
+
         repeat(obstacleCount) {
             val position = Vector2(
                     MathUtils.random() * Gdx.graphics.width,
