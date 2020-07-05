@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.TimeUtils
 import ktx.box2d.createWorld
 
 class BoidCars : ApplicationAdapter() {
@@ -36,12 +37,19 @@ class BoidCars : ApplicationAdapter() {
 
     private val entities = mutableSetOf<Any>()
 
+    private val target = Target(Vector2())
+    private val centerStage = Vector2()
+    private var lesserAxis = 0f
+    private var targetAngle = 0f
+
     override fun create() {
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
 
         stageWidth = Gdx.graphics.width / pixelsPerMeter
         stageHeight = Gdx.graphics.height / pixelsPerMeter
+        centerStage.set(stageWidth/2, stageHeight/2)
+        lesserAxis = if (stageWidth < stageHeight) stageWidth else stageHeight
 
         val boundingWalls = BoundingWalls(stageWidth, stageHeight, box2dWorld)
 
@@ -76,11 +84,20 @@ class BoidCars : ApplicationAdapter() {
             boids.add(bird)
             entities.add(bird)
         }
+
+        val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
+        target.position.set(centerStage.cpy().add(offset))
+        entities.add(target)
     }
 
     override fun render() {
         box2dWorld.step(timeStep, velocityIterations, positionIterations)
         entities.forEach { if (it is Updateable) it.update(entities) }
+
+        targetAngle += 0.6f
+        val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
+        target.position.set(centerStage.cpy().add(offset))
+
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         shapeRenderer!!.begin()
