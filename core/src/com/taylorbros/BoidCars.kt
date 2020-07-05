@@ -21,7 +21,7 @@ class BoidCars : ApplicationAdapter() {
 
     private val box2dWorld = createWorld()
 
-    private val boidCount = 80
+    private val boidCount = 200
     private val boidSize = 0.1f
     private val boidDensity = 10f
     private val maxSpeed = 2f
@@ -51,7 +51,7 @@ class BoidCars : ApplicationAdapter() {
                     MathUtils.random() * stageHeight
             )
             val variableSize = MathUtils.random() * (maxObstacleSize - minObstacleSize) + minObstacleSize
-            val obstacle = Obstacle(position, variableSize)
+            val obstacle = Obstacle(position, variableSize, box2dWorld)
             entities.add(obstacle)
         }
         repeat(boidCount) {
