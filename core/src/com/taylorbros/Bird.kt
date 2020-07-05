@@ -53,6 +53,10 @@ class Bird(
         if (localObstacles.isNotEmpty()) {
             desiredMovement.add(obstacleAvoidanceForce(localObstacles))
         }
+        val targets = entities.filterIsInstance<Target>()
+        if (targets.isNotEmpty()) {
+            desiredMovement.add(targetsSeekingForce(targets))
+        }
         if (desiredMovement.len() > maxAcceleration) {
             desiredMovement.setLength(maxAcceleration)
         }
@@ -150,6 +154,16 @@ class Bird(
             }
         }
         return avoidForce
+    }
+
+    private fun targetsSeekingForce(targets: List<Target>): Vector2 {
+        val seekingForce = Vector2()
+        val magnitude = 0.5f
+        targets.forEach {
+            val seekVector = it.position.cpy().sub(this.position).setLength(magnitude)
+            seekingForce.add(seekVector)
+        }
+        return seekingForce
     }
 
     override fun shapeRender(shapeRenderer: ShapeRenderer, pixelsPerMeter: Float) {

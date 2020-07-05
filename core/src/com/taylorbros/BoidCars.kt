@@ -94,7 +94,7 @@ class BoidCars : ApplicationAdapter() {
         box2dWorld.step(timeStep, velocityIterations, positionIterations)
         entities.forEach { if (it is Updateable) it.update(entities) }
 
-        targetAngle += 0.6f
+        targetAngle += 0.3f
         val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
         target.position.set(centerStage.cpy().add(offset))
 
