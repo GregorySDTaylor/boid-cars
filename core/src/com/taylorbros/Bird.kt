@@ -30,7 +30,7 @@ class Bird(
         }
     }
     init {
-        body.linearVelocity = velocity
+        body.linearVelocity = initialVelocity
     }
 
     override val position: Vector2
