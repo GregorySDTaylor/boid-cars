@@ -9,11 +9,7 @@ import com.badlogic.gdx.InputProcessor
 import ktx.box2d.body
 import ktx.box2d.circle
 import ktx.box2d.mouseJointWith
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.DynamicBody
 import ktx.box2d.polygon
-import sun.security.acl.WorldGroupImpl
-import kotlin.math.absoluteValue
-import kotlin.math.pow
 
 class BoidLord(
         override val size: Float,
