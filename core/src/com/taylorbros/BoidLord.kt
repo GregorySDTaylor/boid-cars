@@ -10,6 +10,7 @@ import ktx.box2d.body
 import ktx.box2d.circle
 import ktx.box2d.mouseJointWith
 import ktx.box2d.polygon
+import kotlin.math.pow
 
 class BoidLord(
         override val size: Float,
@@ -23,6 +24,9 @@ class BoidLord(
         private val stageWidth: Float,
         private val stageHeight: Float
 ) : Boid, InputProcessor {
+
+    private val torqueFactor = 0.1f
+    private val rotationalDragFactor = 0.05f
 
     private val body = world.body {
         type = BodyDef.BodyType.DynamicBody
@@ -51,7 +55,22 @@ class BoidLord(
         get() = this.body.linearVelocity
 
     override fun update(entities: Set<Any>) {
-//        TODO("Not yet implemented")
+        val torque = rotateIntoVelocity()
+        body.applyTorque(torque, true)
+        val rotationalDrag = rotationalDrag()
+        body.applyTorque(rotationalDrag, true)
+    }
+
+    private fun rotationalDrag(): Float {
+        val dragMagnitude = (rotationalDragFactor * body.angularVelocity).pow(2)
+        return if (body.angularVelocity < 0) dragMagnitude else -dragMagnitude
+    }
+
+    private fun rotateIntoVelocity(): Float {
+        val currentOrientation = Vector2(1f, 0f).setAngleRad(body.angle)
+        val desiredOrientation = this.body.linearVelocity
+        val difference = currentOrientation.angleRad(desiredOrientation)
+        return torqueFactor * difference
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
