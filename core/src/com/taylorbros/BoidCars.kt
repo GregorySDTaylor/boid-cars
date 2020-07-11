@@ -41,11 +41,6 @@ class BoidCars : ApplicationAdapter() {
 
     private val entities = mutableSetOf<Any>()
 
-    private val target = Target(Vector2())
-    private val centerStage = Vector2()
-    private var lesserAxis = 0f
-    private var targetAngle = 0f
-
     private var camera = OrthographicCamera()
     private var debugRenderer: Box2DDebugRenderer? = null
 
@@ -56,9 +51,6 @@ class BoidCars : ApplicationAdapter() {
         debugRenderer = Box2DDebugRenderer()
         shapeRenderer = ShapeRenderer()
         shapeRenderer!!.setAutoShapeType(true)
-
-        centerStage.set(0f, 0f)
-        lesserAxis = if (stageWidth < stageHeight) stageWidth else stageHeight
 
         val boundingWalls = BoundingWalls(stageWidth, stageHeight, box2dWorld)
 
@@ -94,18 +86,27 @@ class BoidCars : ApplicationAdapter() {
             entities.add(bird)
         }
 
-        val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
-        target.position.set(centerStage.cpy().add(offset))
-        entities.add(target)
+        val birdLord = BoidLord(
+                boidSize,
+                boidDensity,
+                Vector2(0f, 0f),
+                localDistance,
+                0f,
+                0f,
+                box2dWorld,
+                pixelsPerMeter,
+                stageWidth,
+                stageHeight
+        )
+
+        boids.add(birdLord);
+        entities.add(birdLord);
+        Gdx.app.input.inputProcessor = birdLord
     }
 
     override fun render() {
         box2dWorld.step(timeStep, velocityIterations, positionIterations)
         entities.forEach { if (it is Updateable) it.update(entities) }
-
-        targetAngle += 1f
-        val offset = Vector2(lesserAxis/3, 0f).setAngle(targetAngle)
-        target.position.set(centerStage.cpy().add(offset))
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
