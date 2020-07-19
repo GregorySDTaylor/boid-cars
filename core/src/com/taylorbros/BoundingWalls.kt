@@ -16,7 +16,7 @@ class BoundingWalls(stageWidth: Float, stageHeight: Float, world: World) {
         chain(Vector2(-stageWidth / 2, -stageHeight / 2),
                 Vector2(-stageWidth / 2, stageHeight / 2),
                 Vector2(stageWidth / 2, stageHeight / 2),
-                Vector2(stageWidth, -stageHeight / 2),
+                Vector2(stageWidth / 2, -stageHeight / 2),
                 Vector2(-stageWidth / 2, -stageHeight / 2))
     }
 }
